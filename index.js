@@ -31,25 +31,6 @@ app.use(express.json()) //body parser when you make a post request
 app.use(helmet());
 app.use(morgan("common"))
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/images/");
-    },
-    filename: (req, file, cb) => {
-        cb(null, req.body.name);
-    },
-})
-
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
-    try {
-        console.log("Done");
-        return res.status(200).json("File uploaded successfully");
-    } catch (err) {
-        console.log(err);
-    }
-})
-
 app.use('/api/auth', authRoute)
 app.use('/api/users', userRoute)
 app.use('/api/posts', postRoute)
