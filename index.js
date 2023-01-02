@@ -23,13 +23,13 @@ mongoose.connect(process.env.MONGO_URL,
         console.log("Connected to Mongodb")
     });
 
+app.use("/images", express.static(path.join(__dirname, "public/images")));
+
 //middleware
-app.use('*',cors())
+app.use('*', cors())
 app.use(express.json()) //body parser when you make a post request
 app.use(helmet());
 app.use(morgan("common"))
-
-app.use("/images",express.static(path.join(__dirname,"public/images")));
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -44,7 +44,7 @@ const upload = multer({ storage: storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
     try {
         return res.status(200).json("File uploaded successfully");
-    } catch (err) { 
+    } catch (err) {
         console.log(err);
     }
 })
