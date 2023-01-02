@@ -9,7 +9,7 @@ const authRoute = require('./routes/auth')
 const postRoute = require('./routes/posts')
 const multer = require("multer");
 const path = require("path");
-const cors = require('cors');
+let cors = require('cors');
 
 dotenv.config();
 
@@ -56,5 +56,5 @@ app.use('/api/posts', postRoute)
 const port = process.env.PORT || 8800;
 
 app.listen(port, () => {
-    console.log(`Backend server listening on port http://localhost:8800  `);
+    console.log(`Backend server listening on port ${port}  `);
 })
