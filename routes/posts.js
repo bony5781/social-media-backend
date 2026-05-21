@@ -157,11 +157,15 @@ router.put('/:id/comment', async (req, res) => {
             createdAt: new Date()
         };
 
-        await post.updateOne({
-            $push: {
-                comments: newComment
-            }
-        });
+        await Post.findByIdAndUpdate(
+            req.params.id,
+            {
+                $push: {
+                    comments: newComment
+                }
+            },
+            { new: true }
+        );
 
         res.status(200).json(
             "Comment added successfully"
@@ -169,31 +173,10 @@ router.put('/:id/comment', async (req, res) => {
 
     } catch (err) {
 
+        console.log(err);
+
         res.status(500).json({
             message: "Failed to add comment"
-        });
-    }
-});
-
-
-// Get single post
-router.get('/:id', async (req, res) => {
-
-    try {
-
-        const post = await Post.findById(req.params.id);
-
-        const postObj = post.toObject();
-
-        res.status(200).json({
-            ...postObj,
-            comments: postObj.comments || []
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            message: "Failed to fetch post"
         });
     }
 });
@@ -238,6 +221,8 @@ router.get('/timeline/:userId', async (req, res) => {
 
     } catch (err) {
 
+        console.log(err);
+
         res.status(500).json({
             message: "Failed to fetch timeline"
         });
@@ -272,8 +257,43 @@ router.get('/profile/:username', async (req, res) => {
 
     } catch (err) {
 
+        console.log(err);
+
         res.status(500).json({
             message: "Failed to fetch profile posts"
+        });
+    }
+});
+
+
+// Get single post
+// IMPORTANT: KEEP THIS LAST
+router.get('/:id', async (req, res) => {
+
+    try {
+
+        const post = await Post.findById(req.params.id);
+
+        if (!post) {
+
+            return res.status(404).json({
+                message: "Post not found"
+            });
+        }
+
+        const postObj = post.toObject();
+
+        res.status(200).json({
+            ...postObj,
+            comments: postObj.comments || []
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            message: "Failed to fetch post"
         });
     }
 });
