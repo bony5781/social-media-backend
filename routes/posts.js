@@ -136,6 +136,11 @@ router.put('/:id/comment', async (req, res) => {
             });
         }
 
+        if (!post.comments) {
+
+            post.comments = [];
+        }
+
         if (!req.body.text || req.body.text.trim() === "") {
 
             return res.status(400).json({
@@ -157,19 +162,14 @@ router.put('/:id/comment', async (req, res) => {
             createdAt: new Date()
         };
 
-        await Post.findByIdAndUpdate(
-            req.params.id,
-            {
-                $push: {
-                    comments: newComment
-                }
-            },
-            { new: true }
-        );
+        post.comments.push(newComment);
 
-        res.status(200).json(
-            "Comment added successfully"
-        );
+        await post.save();
+
+        res.status(200).json({
+            message: "Comment added successfully",
+            comments: post.comments
+        });
 
     } catch (err) {
 
@@ -180,7 +180,6 @@ router.put('/:id/comment', async (req, res) => {
         });
     }
 });
-
 
 // Get timeline posts
 router.get('/timeline/:userId', async (req, res) => {
