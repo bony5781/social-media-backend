@@ -42,7 +42,9 @@ router.put('/:id', async (req, res) => {
 
         } else {
 
-            res.status(403).json("You can only update your own post");
+            res.status(403).json(
+                "You can only update your own post"
+            );
         }
 
     } catch (err) {
@@ -69,7 +71,9 @@ router.delete('/:id', async (req, res) => {
 
         } else {
 
-            res.status(403).json("You can only delete your own post");
+            res.status(403).json(
+                "You can only delete your own post"
+            );
         }
 
     } catch (err) {
@@ -91,7 +95,9 @@ router.put('/:id/like', async (req, res) => {
         if (!post.like.includes(req.body.userId)) {
 
             await post.updateOne({
-                $push: { like: req.body.userId }
+                $push: {
+                    like: req.body.userId
+                }
             });
 
             res.status(200).json("Post liked");
@@ -99,7 +105,9 @@ router.put('/:id/like', async (req, res) => {
         } else {
 
             await post.updateOne({
-                $pull: { like: req.body.userId }
+                $pull: {
+                    like: req.body.userId
+                }
             });
 
             res.status(200).json("Post disliked");
@@ -141,7 +149,8 @@ router.put('/:id/comment', async (req, res) => {
 
             username: req.body.username,
 
-            profilePicture: req.body.profilePicture || "",
+            profilePicture:
+                req.body.profilePicture || "",
 
             text: req.body.text,
 
@@ -154,7 +163,9 @@ router.put('/:id/comment', async (req, res) => {
             }
         });
 
-        res.status(200).json("Comment added successfully");
+        res.status(200).json(
+            "Comment added successfully"
+        );
 
     } catch (err) {
 
@@ -172,7 +183,12 @@ router.get('/:id', async (req, res) => {
 
         const post = await Post.findById(req.params.id);
 
-        res.status(200).json(post);
+        const postObj = post.toObject();
+
+        res.status(200).json({
+            ...postObj,
+            comments: postObj.comments || []
+        });
 
     } catch (err) {
 
@@ -184,12 +200,13 @@ router.get('/:id', async (req, res) => {
 
 
 // Get timeline posts
-// Get timeline posts
 router.get('/timeline/:userId', async (req, res) => {
 
     try {
 
-        const currUser = await User.findById(req.params.userId);
+        const currUser = await User.findById(
+            req.params.userId
+        );
 
         const userPosts = await Post.find({
             userId: currUser._id
@@ -241,7 +258,17 @@ router.get('/profile/:username', async (req, res) => {
             userId: user._id
         });
 
-        res.status(200).json(posts);
+        const formattedPosts = posts.map((post) => {
+
+            const postObj = post.toObject();
+
+            return {
+                ...postObj,
+                comments: postObj.comments || []
+            };
+        });
+
+        res.status(200).json(formattedPosts);
 
     } catch (err) {
 
