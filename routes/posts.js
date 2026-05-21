@@ -184,6 +184,7 @@ router.get('/:id', async (req, res) => {
 
 
 // Get timeline posts
+// Get timeline posts
 router.get('/timeline/:userId', async (req, res) => {
 
     try {
@@ -204,9 +205,19 @@ router.get('/timeline/:userId', async (req, res) => {
             })
         );
 
-        res.status(200).json(
-            userPosts.concat(...friendPosts)
-        );
+        const allPosts = userPosts
+            .concat(...friendPosts)
+            .map((post) => {
+
+                const postObj = post.toObject();
+
+                return {
+                    ...postObj,
+                    comments: postObj.comments || []
+                };
+            });
+
+        res.status(200).json(allPosts);
 
     } catch (err) {
 
